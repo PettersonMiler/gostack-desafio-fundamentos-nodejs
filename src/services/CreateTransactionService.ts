@@ -14,9 +14,13 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    const balance = this.transactionsRepository.getBalance();
+    if (!['income', 'outcome'].includes(type)) {
+      throw Error('Tipo invalido');
+    }
 
-    if (type === 'outcome' && balance.total - value < 0) {
+    const { total } = this.transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) {
       throw Error('Saldo negativo');
     }
 
